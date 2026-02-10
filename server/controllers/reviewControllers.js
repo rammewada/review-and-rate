@@ -12,8 +12,18 @@ const createReview = async (req, res) => {
       },
     });
   } catch (error) {
-    console.log(error);
-    res.status(500).json({ message: "Server error", error: error.message });
+    if (error.name == "ValidationError") {
+      return res.status(400).json({
+        status: "fail",
+        errors: Object.values(error.errors).map((err) => err.message),
+      });
+    } else {
+      return res.status(500).json({
+        status: "error",
+        message: "Server error",
+        error: error.message,
+      });
+    }
   }
 };
 

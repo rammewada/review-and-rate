@@ -15,6 +15,14 @@
 :root {
   --gradient: linear-gradient(135deg, #d100f3, #002bc5);
 }
+
+@theme inline {
+  --color-white: #ffffff;
+  --color-black: #000000;
+  --color-primary: #d100f3;
+  --color-secondary: #002bc5;
+}
+
 .custom-gradient {
   background: var(--gradient);
 }
@@ -22,6 +30,7 @@
 .d {
   border: 1px solid red;
 }
+
 .text-gradient {
   background: var(--gradient);
   text: transparent;

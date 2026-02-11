@@ -7,6 +7,7 @@ import multer from "multer";
 import mongoSanitize from "express-mongo-sanitize";
 import companyRouter from "./routes/companyRouter.js";
 import reviewRouter from "./routes/reviewRouter.js";
+import AppError from "./utils/appError.js";
 const app = express();
 
 app.use(cors());
@@ -30,10 +31,7 @@ app.use((req, res) => {
 app.use((err, req, res, next) => {
   if (err instanceof multer.MulterError) {
     if (err.code === "LIMIT_FILE_SIZE") {
-      return res.status(400).json({
-        status: "fail",
-        message: "File size too large. Maximum size is 5MB",
-      });
+      err = new AppError("File size too large. Maximum size is 1MB", 400);
     }
     return res.status(400).json({
       status: "fail",
@@ -41,8 +39,20 @@ app.use((err, req, res, next) => {
     });
   }
 
+  if (err.name === "CastError") {
+    err = new AppError("Invalid ID format", 400);
+  }
+
+  if (err.code === 11000) {
+    err = new AppError("Duplicate field value", 400);
+  }
+
+  if (err.name === "ValidationError") {
+    err = new AppError(err.message, 400);
+  }
+
   console.error("Error:", err);
-  res.status(err.status || 500).json({
+  res.status(err.statusCode || 500).json({
     status: "error",
     message: err.message || "Internal server error",
   });

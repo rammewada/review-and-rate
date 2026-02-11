@@ -1,131 +1,112 @@
 import Company from "../models/companyModel.js";
+import AppError from "../utils/appError.js";
+import { catchAsync } from "../utils/catchAsync.js";
 
-export const createCompany = async (req, res) => {
-  try {
-    if (!req.file) {
-      return res.status(400).json({
-        status: "fail",
-        message: "Company logo is required",
-      });
-    }
-    const filename = req.file.path;
-    req.body.logo = filename;
-
-    const company = await Company.create(req.body);
-
-    console.log("Company created successfully:", company);
-
-    res.status(201).json({
-      status: "success",
-      data: {
-        company,
-      },
-    });
-  } catch (error) {
-    console.log("Error creating company:", error);
-
-    if (error.name === "ValidationError") {
-      return res.status(400).json({
-        status: "fail",
-        message: "Validation error",
-        errors: Object.values(error.errors).map((err) => err.message),
-      });
-    }
-
-    if (error.code === 11000) {
-      return res.status(400).json({
-        status: "fail",
-        message: "Company with this name already exists",
-      });
-    }
-
-    res.status(500).json({
-      status: "error",
-      message: "Server error",
-      error: error.message,
-    });
+export const createCompany = catchAsync(async (req, res, next) => {
+  if (!req.file) {
+    return next(new AppError("Company logo is required", 400));
   }
-};
-export const getAllCompanies = async (req, res) => {
-  try {
-    const {
-      search,
-      sort = "createdAt",
-      order = "desc",
-      page = 1,
-      limit = 10,
-      city,
-      minRating,
-    } = req.query;
 
-    const filter = {};
+  const filename = req.file.path;
+  req.body.logo = filename;
 
-    if (search && search.trim()) {
-      filter.$or = [
-        { name: { $regex: search, $options: "i" } },
-        { address: { $regex: search, $options: "i" } },
-        { city: { $regex: search, $options: "i" } },
-      ];
-    }
+  req.body.foundedYear = new Date(req.body.foundedYear);
 
-    if (city) {
-      filter.city = city;
-    }
+  const company = await Company.create(req.body);
 
-    if (minRating) {
-      filter.ratingsAverage = { $gte: Number(minRating) };
-    }
+  console.log("Company created successfully:", company);
 
-    const sortOptions = {};
+  res.status(201).json({
+    status: "success",
+    data: {
+      company,
+    },
+  });
+});
+
+export const getAllCompanies = catchAsync(async (req, res, next) => {
+  const {
+    search,
+    sort = "createdAt",
+    order = "desc",
+    page = 1,
+    limit = 10,
+    city,
+    minRating,
+    topRated,
+  } = req.query;
+
+  const filter = {};
+
+  if (search && search.trim()) {
+    filter.$or = [
+      { name: { $regex: search, $options: "i" } },
+      { address: { $regex: search, $options: "i" } },
+      { city: { $regex: search, $options: "i" } },
+    ];
+  }
+
+  if (city) {
+    filter.city = city;
+  }
+
+  if (minRating) {
+    filter.ratingsAverage = { $gte: Number(minRating) };
+  }
+
+  let sortOptions = {};
+  if (sort === "ratingsAverage" || topRated === "true") {
+    sortOptions = { ratingsAverage: -1 };
+  } else if (city) {
+    sortOptions = { name: 1 };
+  } else {
     sortOptions[sort] = order === "asc" ? 1 : -1;
-
-    const skip = (Number(page) - 1) * Number(limit);
-
-    const companies = await Company.find(filter)
-      .sort(sortOptions)
-      .skip(skip)
-      .limit(Number(limit))
-      .select("-__v");
-
-    const total = await Company.countDocuments(filter);
-
-    res.status(200).json({
-      status: "success",
-      page: Number(page),
-      limit: Number(limit),
-      total,
-      results: companies.length,
-      data: { companies },
-    });
-  } catch (error) {
-    console.error("getAllCompanies error:", error);
-    res.status(500).json({
-      status: "error",
-      message: "Server error",
-    });
   }
-};
 
-export const getCompany = async (req, res) => {
-  try {
-    const company = await Company.findById(req.params.id).populate("reviews");
-    if (!company) {
-      return res.status(404).json({
-        status: "fail",
-        message: "Company not found",
-      });
-    }
+  const skip = (Number(page) - 1) * Number(limit);
 
-    return res.status(200).json({
-      status: "sucess",
-      data: {
-        company,
-      },
-    });
-  } catch (error) {
-    console.log(error);
-    res
-      .status(500)
-      .json({ status: "error", message: "Server error", error: error.message });
+  const companies = await Company.find(filter)
+    .sort(sortOptions)
+    .skip(skip)
+    .limit(Number(limit))
+    .select("-__v");
+
+  const total = await Company.countDocuments(filter);
+
+  res.status(200).json({
+    status: "success",
+    page: Number(page),
+    limit: Number(limit),
+    total,
+    results: companies.length,
+    data: { companies },
+  });
+});
+
+export const getCompany = catchAsync(async (req, res, next) => {
+  const company = await Company.findById(req.params.id).populate("reviews");
+  if (!company) {
+    return next(new AppError("Company not found", 404));
   }
-};
+
+  return res.status(200).json({
+    status: "sucess",
+    data: {
+      company,
+    },
+  });
+});
+
+export const deleteCompany = catchAsync(async (req, res, next) => {
+  const company = await Company.findByIdAndDelete(req.params.id);
+
+  if (!company) {
+    return next(new AppError("Company not found", 404));
+  }
+  res.status(200).json({
+    status: "success",
+    data: {
+      company,
+    },
+  });
+});

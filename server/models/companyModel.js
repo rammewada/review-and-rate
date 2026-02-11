@@ -19,12 +19,12 @@ const companySchema = new mongoose.Schema(
       trim: true,
     },
     foundedYear: {
-      type: Number,
-      required: [true, "Founded year is required"],
+      type: Date,
+      required: [true, "Founded date is required"],
     },
     logo: {
       type: String,
-      required: [true, "Company logo must have a Logo"],
+      required: [true, "Company logo is required"],
       trim: true,
     },
     city: {

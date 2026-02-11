@@ -4,9 +4,11 @@ import path from "path";
 import { fileURLToPath } from "url";
 import {
   createCompany,
+  deleteCompany,
   getAllCompanies,
   getCompany,
 } from "../controllers/companyControllers.js";
+import AppError from "../utils/appError.js";
 
 const router = express.Router();
 const storage = multer.diskStorage({
@@ -25,7 +27,7 @@ const fileFilter = (req, file, cb) => {
     if (file.mimetype.startsWith("image/")) {
       cb(null, true);
     } else {
-      cb(new Error("Only image files are allowed"));
+      cb(new AppError("Only image files are allowed", 400));
     }
   }
 };
@@ -34,7 +36,7 @@ const upload = multer({
   storage,
   fileFilter,
   limits: {
-    fileSize: 5 * 1024 * 1024, // 5MB limit
+    fileSize: 1 * 1024 * 1024,
   },
 });
 
@@ -43,5 +45,6 @@ router
   .post(upload.single("logo"), createCompany)
   .get(getAllCompanies);
 
-router.route("/:id").get(getCompany);
+router.route("/:id").get(getCompany).delete(deleteCompany);
+
 export default router;

@@ -1,11 +1,14 @@
 import express from "express";
 import {
   createReview,
+  deleteOneReview,
   getAllRevies,
+  getOneReview,
 } from "../controllers/reviewControllers.js";
-import { get } from "mongoose";
-const Router = express.Router();
 
-Router.route("/").post(createReview).get(getAllRevies);
+const router = express.Router();
 
-export default Router;
+router.route("/").post(createReview).get(getAllRevies);
+router.route("/:id").get(getOneReview).delete(deleteOneReview);
+
+export default router;

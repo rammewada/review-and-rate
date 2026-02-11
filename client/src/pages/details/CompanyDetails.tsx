@@ -39,9 +39,7 @@ export default function CompanyDetails() {
       try {
         setLoading(true);
         setError(null);
-        const res = await axios.get(
-          `http://localhost:4000/api/company/${id}`
-        );
+        const res = await axios.get(`http://localhost:4000/api/company/${id}`);
         const data: Company | undefined = res?.data?.data?.company;
         if (!data) {
           setError("Company not found");
@@ -79,7 +77,7 @@ export default function CompanyDetails() {
   };
 
   const formatReviewDateTime = (
-    iso: string
+    iso: string,
   ): { date: string; time: string } | null => {
     const d = new Date(iso);
     if (Number.isNaN(d.getTime())) return null;
@@ -132,8 +130,8 @@ export default function CompanyDetails() {
         {/* Header card */}
         <div className="bg-white rounded-2xl shadow-lg p-6 md:p-8 mb-6">
           <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-6">
-            <div className="flex items-center gap-5">
-              <div className="w-20 h-20 md:w-24 md:h-24 rounded-xl bg-gray-100 flex items-center justify-center overflow-hidden">
+            <div className="flex items-center gap-4 md:gap-5 w-full md:w-auto">
+              <div className="w-16 h-16 md:w-24 md:h-24 rounded-xl bg-gray-100 flex items-center justify-center overflow-hidden shrink-0">
                 {company.logo ? (
                   <img
                     src={renderLogo(company.logo)}
@@ -148,38 +146,38 @@ export default function CompanyDetails() {
               </div>
 
               <div>
-                <h1 className="text-xl md:text-2xl font-semibold text-gray-900">
+                <h1 className="text-lg md:text-2xl font-semibold text-gray-900">
                   {company.name}
                 </h1>
-                <p className="mt-1 text-sm text-gray-500">
+                <p className="mt-1 text-xs md:text-sm text-gray-500">
                   {company.address}
                 </p>
 
-                <div className="mt-3 flex items-center gap-3">
+                <div className="mt-2 md:mt-3 flex items-center gap-3">
                   <div className="flex items-center gap-2">
-                    <span className="text-lg font-semibold text-gray-900">
+                    <span className="text-base md:text-lg font-semibold text-gray-900">
                       {company.ratingsAverage?.toFixed(1) ?? "0.0"}
                     </span>
-                    <span className="text-yellow-400 text-lg">
+                    <span className="text-yellow-400 text-sm md:text-lg">
                       {renderStars(company.ratingsAverage || 0)}
                     </span>
                   </div>
-                  <span className="text-sm text-gray-500">
+                  <span className="text-xs md:text-sm text-gray-500">
                     {company.ratingsQuantity ?? 0} Reviews
                   </span>
                 </div>
               </div>
             </div>
 
-            <div className="flex flex-col items-end gap-3">
+            <div className="flex flex-row md:flex-col items-center md:items-end justify-between md:justify-start w-full md:w-auto gap-3 mt-2 md:mt-0">
               {formattedFoundedDate && (
-                <p className="text-xs md:text-sm text-gray-500">
+                <p className="text-xs md:text-sm text-gray-500 order-1 md:order-none">
                   {formattedFoundedDate}
                 </p>
               )}
 
               <button
-                className="custom-gradient text-white text-sm md:text-base font-medium px-4 py-2 rounded-md shadow-md hover:opacity-90 transition"
+                className="custom-gradient text-white text-sm md:text-base font-medium px-4 py-2 rounded-md shadow-md hover:opacity-90 transition order-2 md:order-none"
                 onClick={() => setShowAddReview(true)}
               >
                 + Add Review
@@ -217,9 +215,7 @@ export default function CompanyDetails() {
                           {review.name}
                         </span>
                         <span className="text-xs text-gray-400">
-                          {dateTime
-                            ? `${dateTime.date}, ${dateTime.time}`
-                            : ""}
+                          {dateTime ? `${dateTime.date}, ${dateTime.time}` : ""}
                         </span>
                       </div>
                       <p className="mt-2 text-sm text-gray-600 leading-relaxed">

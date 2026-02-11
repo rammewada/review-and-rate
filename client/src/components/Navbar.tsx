@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Menu, X } from "lucide-react";
+import { Link } from "react-router-dom";
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
@@ -10,11 +11,13 @@ export default function Navbar() {
         <div className="flex items-center justify-between py-3">
           {/* Logo Section */}
           <div className="flex items-center gap-3">
-            <img src="/icon.png" alt="logo" className="h-8 w-auto" />
-            <span className="inline-block font-sans text-2xl">
-              <span>Review</span> <span className="text-gradient">&</span>{" "}
-              <span className="text-gradient font-bold">Rate</span>
-            </span>
+            <Link to="/" className=" flex items-center gap-2">
+              <img src="/icon.png" alt="logo" className="h-8 w-auto" />
+              <span className="inline-block font-sans text-2xl">
+                <span>Review</span> <span className="text-gradient">&</span>{" "}
+                <span className="text-gradient font-bold">Rate</span>
+              </span>
+            </Link>
           </div>
 
           {/* Desktop Menu */}

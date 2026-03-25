@@ -27,7 +27,7 @@ name:""
 address:""
 city:""
 logo: file ,
-foundedYear: number e.g. 2025
+foundedYear: date e.g. 12-01-2025
 }
 
 ```

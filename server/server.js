@@ -8,6 +8,6 @@ mongoose.connect(process.env.MONGO_URI).then(() => {
   console.log("DB connection successfull");
 });
 
-app.listen(process.env.PORT, () => {
+app.listen(process.env.PORT || 5000, () => {
   console.log(`Server is running on port ${process.env.PORT}`);
 });

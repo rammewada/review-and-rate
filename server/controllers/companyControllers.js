@@ -30,7 +30,7 @@ export const getAllCompanies = catchAsync(async (req, res, next) => {
     sort = "createdAt",
     order = "desc",
     page = 1,
-    limit = 10,
+    limit = 20,
     city,
     minRating,
     topRated,
